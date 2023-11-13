@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "679925859713",
+    "project_id": "navian-ee441",
+    "storage_bucket": "navian-ee441.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:679925859713:android:2b861a8e8c61d913ccd480",
+        "android_client_info": {
+          "package_name": "com.example.navian"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-uS-GWJ9c2BcxU9R6rJmiBl8sAK_ZGus"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
