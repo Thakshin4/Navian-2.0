@@ -9,7 +9,11 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
+// Authentication
 fun handleSignIn(navController: NavController, email: String, password: String)
 {
     // Create an instance of FirebaseAuth
@@ -48,28 +52,44 @@ fun validatePassword(password: String): Boolean
     return valid
 }
 
-fun handleCreateObservation(observation: Observation)
-{
+// Observations
+fun handleCreateObservation(observation: Observation) {
     // Get the current user's UID
-    val uid = FirebaseAuth.getInstance().currentUser?.uid
+    val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
     // Create a database reference to the "users" node in the database
     val usersRef = FirebaseDatabase.getInstance().getReference("users")
 
-    // Write the new category and timesheet to the database under the user's node
-    val observationsKey = usersRef.child(uid!!).child("observations").push().key
+    // Write the new observation to the database under the user's node
+    val observationsKey = usersRef.child(uid).child("observations").push().key ?: return
 
-    val childUpdates = HashMap<String, Any>()
-    childUpdates["$uid/observations/$observationsKey"] = observation
+    // Convert the observation date and time to server timestamp
+    val observationMap = mapOf(
+        "species" to observation.species,
+        "location" to mapOf(
+            "latitude" to observation.location.latitude,
+            "longitude" to observation.location.longitude
+        ),
+        "date" to observation.date.toString(),  // Assuming date is a string here
+        "time" to observation.time.toString(),  // Assuming time is a string here
+        "notes" to observation.notes
+    )
+
+    // Create a map with the observation data
+    val childUpdates = HashMap<String, Any>().apply {
+        put("$uid/observations/$observationsKey", observationMap)
+        // Add any other updates you might need
+    }
 
     usersRef.updateChildren(childUpdates)
         .addOnSuccessListener {
-            // Category and timesheet data successfully written to the database
+            // Observation data successfully written to the database
         }
         .addOnFailureListener { e ->
             // An error occurred while writing the data
         }
 }
+
 
 fun handleSettings(settings: Settings) {
     // Get the current user's UID
@@ -130,30 +150,29 @@ fun createSettings(uid: String, settings: Settings) {
         }
 }
 
-fun readObservations(): MutableList<Observation> {
-    var observations: MutableList<Observation> = mutableListOf<Observation>()
-
-    // Get the current user's UID
+suspend fun readObservations(): List<Observation> = suspendCancellableCoroutine { continuation ->
     val uid = FirebaseAuth.getInstance().currentUser?.uid
-
-    // Create a database reference to the "users" node in the database
     val usersRef = FirebaseDatabase.getInstance().getReference("users")
 
-    // Read the user's categories from the database
     usersRef.child(uid!!).child("observations").addListenerForSingleValueEvent(object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
+            val observations = mutableListOf<Observation>()
+
             for (observationSnapshot in dataSnapshot.children) {
                 val observation = observationSnapshot.getValue(Observation::class.java)
                 observation?.let {
                     observations.add(observation)
                 }
             }
+
+            continuation.resume(observations)
         }
+
         override fun onCancelled(databaseError: DatabaseError) {
-            // An error occurred while reading the data
+            continuation.resumeWithException(databaseError.toException())
         }
     })
- return observations
 }
+
 
 // ReadSettings Here

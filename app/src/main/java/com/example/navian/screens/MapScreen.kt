@@ -31,6 +31,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.example.navian.Observation
 import com.example.navian.Screen
 import com.example.navian.services.getHotspotsAsync
 import com.example.navian.services.readObservations
@@ -49,6 +51,8 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -196,11 +200,28 @@ fun MapCompose()
             }
 
             // Display Observations Markers
-            val observations = readObservations()
+            var observations by remember { mutableStateOf(emptyList<Observation>()) }
+
+            DisposableEffect(Unit) {
+                // Example usage in a coroutine scope
+                GlobalScope.launch {
+                    try {
+                        observations = readObservations()
+                        // Handle the list of observations here
+                    } catch (e: Exception) {
+                        // Handle exceptions
+                    }
+                }
+
+                onDispose {
+                    // Cleanup, if needed
+                }
+            }
+
             for (o in observations)
             {
                 Marker(
-                    state = MarkerState(position = o.location),
+                    state = MarkerState(position = LatLng(o.location.latitude, o.location.longitude)),
                     title = "Hotspot Location",
                     snippet = "Marker in Current Location",
                     icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)

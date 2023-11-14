@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
@@ -20,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -34,7 +36,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
+import com.example.navian.CustomLatLng
 import com.example.navian.Observation
+import com.example.navian.services.handleCreateObservation
+import com.example.navian.services.readObservations
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
@@ -42,11 +47,11 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-
-var observationsList = mutableListOf<Observation>()
 
 @Composable
 fun ObservationScreen(navController: NavController)
@@ -159,11 +164,11 @@ fun AddObservations(navController: NavController)
         Spacer(modifier = Modifier.weight(1f))
 
         location?.let {
-            val locationLatLng = LatLng(location!!.latitude, location!!.longitude)
+            val locationLatLng = CustomLatLng(location!!.latitude, location!!.longitude)
             Button(
                 onClick = {
-                    val  observation = Observation(species, locationLatLng, date, time, notes)
-                    observationsList.add(observation)
+                    val  observation = Observation(species, locationLatLng, date.toString(), time.toString(), notes)
+                    handleCreateObservation(observation)
                     Toast.makeText( context, "Added", Toast.LENGTH_LONG ).show()
                 },
                 modifier = Modifier
@@ -176,25 +181,43 @@ fun AddObservations(navController: NavController)
 }
 
 @Composable
-fun ViewObservations(navController: NavController)
-{
-    // var observations = readObservations()
-    val observations = observationsList
-    LazyColumn()
-    {
-        for (o in observations)
-        {
-            item {
-                Text(text = o.species, fontSize = 24.sp, modifier = Modifier.padding(4.dp))
-                Text(text = o.location.toString(), modifier = Modifier.padding(4.dp))
-                Text(text = o.date.toString(), modifier = Modifier.padding(4.dp))
-                Text(text = o.time.toString(), modifier = Modifier.padding(4.dp))
-                Text(text = o.notes, modifier = Modifier.padding(4.dp))
+fun ViewObservations(navController: NavController) {
+    var observations by remember { mutableStateOf(emptyList<Observation>()) }
+
+    DisposableEffect(Unit) {
+        // Example usage in a coroutine scope
+        GlobalScope.launch {
+            try {
+                observations = readObservations()
+                // Handle the list of observations here
+            } catch (e: Exception) {
+                // Handle exceptions
+            }
+        }
+
+        onDispose {
+            // Cleanup, if needed
+        }
+    }
+
+    LazyColumn() {
+        items(observations) { observation ->
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                Text(text = observation.species, fontSize = 24.sp)
+                Text(text = observation.location.toString())
+                Text(text = observation.date.toString())
+                Text(text = observation.time.toString())
+                Text(text = observation.notes)
                 Divider()
             }
         }
     }
 }
+
 
 @Composable
 fun DateTimeDialog(

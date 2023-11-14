@@ -11,11 +11,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -24,12 +27,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.navian.Achievement
+import com.example.navian.Observation
 import com.example.navian.R
 import com.example.navian.services.readObservations
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun AchievementScreen(navController: NavController) {
-    val observations = readObservations()
+
+    var observations by remember { mutableStateOf(emptyList<Observation>()) }
+
+    DisposableEffect(Unit) {
+        // Example usage in a coroutine scope
+        GlobalScope.launch {
+            try {
+                observations = readObservations()
+                // Handle the list of observations here
+            } catch (e: Exception) {
+                // Handle exceptions
+            }
+        }
+
+        onDispose {
+            // Cleanup, if needed
+        }
+    }
+
     val observationsCount = observations.size
     AchievementManager.checkAchievements(observationsCount)
     val earnedAchievements = AchievementManager.achievements.filter { it.isEarned }
@@ -79,8 +103,12 @@ object AchievementManager {
     val achievements: List<Achievement> = listOf(
         Achievement(0, "Newcomer", "Used Navian for the First Time!", R.drawable.baseline_emoji_events_24),
         Achievement(1, "First Observation", "Logged your first bird observation!", R.drawable.baseline_emoji_events_24),
-        Achievement(2, "Birdwatcher", "Logged 10 bird observations!", R.drawable.baseline_emoji_events_24)
+        Achievement(2, "Birdwatcher", "Logged 10 bird observations!", R.drawable.baseline_emoji_events_24),
+        Achievement(3, "Observer", "Logged 20 bird observations!", R.drawable.baseline_emoji_events_24),
+        Achievement(4, "Expert Observer", "Logged 50 bird observations!", R.drawable.baseline_emoji_events_24),
+        Achievement(5, "Bird Enthusiast", "Logged 100 bird observations!", R.drawable.baseline_emoji_events_24),
         // Add more achievements here...
+
     )
 
     fun checkAchievements(observationsCount: Int) {
@@ -90,11 +118,15 @@ object AchievementManager {
                     0 -> earnAchievement(achievement, observationsCount >= 0)
                     1 -> earnAchievement(achievement, observationsCount >= 1)
                     2 -> earnAchievement(achievement, observationsCount >= 10)
+                    3 -> earnAchievement(achievement, observationsCount >= 20)
+                    4 -> earnAchievement(achievement, observationsCount >= 50)
+                    5 -> earnAchievement(achievement, observationsCount >= 100)
                     // Add more conditions for other achievements...
                 }
             }
         }
     }
+
 
     private fun earnAchievement(achievement: Achievement, condition: Boolean) {
         if (condition) {
