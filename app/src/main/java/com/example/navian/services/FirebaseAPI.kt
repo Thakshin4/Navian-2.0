@@ -175,4 +175,19 @@ suspend fun readObservations(): List<Observation> = suspendCancellableCoroutine 
 }
 
 
-// ReadSettings Here
+// ReadSettings
+suspend fun readSettings(): Settings? = suspendCancellableCoroutine { continuation ->
+    val uid = FirebaseAuth.getInstance().currentUser?.uid
+    val usersRef = FirebaseDatabase.getInstance().getReference("users")
+
+    usersRef.child(uid!!).child("settings").addListenerForSingleValueEvent(object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+            val settings = dataSnapshot.getValue(Settings::class.java)
+            continuation.resume(settings)
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+            continuation.resumeWithException(databaseError.toException())
+        }
+    })
+}

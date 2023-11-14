@@ -49,6 +49,7 @@ import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -63,9 +64,9 @@ fun ObservationScreen(navController: NavController)
         bottomBar = { HomeBottomAppBar(navController) },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                text = { Text(text = (if (screen) "View" else "Add")) },
+                text = { Text(text = (if (screen) "Add" else "View")) },
                 icon = { Icon(Icons.Filled.KeyboardArrowUp, contentDescription = "") },
-                onClick = { screen = !screen }
+                onClick = { screen = !screen },
             )
         }
     )

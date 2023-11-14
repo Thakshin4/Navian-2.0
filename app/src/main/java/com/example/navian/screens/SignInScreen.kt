@@ -48,7 +48,7 @@ fun SignInScreen(navController: NavController) {
                 .padding(bottom = 16.dp)
         )
 
-        Text("Username")
+        Text("Email:")
         TextField(
             value = email,
             onValueChange = { text -> email = text },
@@ -57,7 +57,7 @@ fun SignInScreen(navController: NavController) {
                 .padding(bottom = 8.dp)
         )
 
-        Text("Password")
+        Text("Password:")
         TextField(
             value = password,
             onValueChange = { text -> password = text },

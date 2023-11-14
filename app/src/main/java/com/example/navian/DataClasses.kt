@@ -1,6 +1,5 @@
 package com.example.navian
 
-import com.google.android.gms.maps.model.LatLng
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -33,6 +32,7 @@ data class Settings(
     val radius: Float
 )
 {
+    constructor() : this("metric", 0f)
     fun toMap(): Map<String, Any>
     {
         return mapOf(

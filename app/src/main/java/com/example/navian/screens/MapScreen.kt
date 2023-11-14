@@ -185,8 +185,6 @@ fun MapCompose()
                 snippet = "Marker in Current Location"
             )
 
-            Log.d("Hotspot Tag", "Displaying Hotspots")
-
             // Display Hotspot Markers
             for (hotspot in hotspots)
             {
@@ -201,7 +199,6 @@ fun MapCompose()
 
             // Display Observations Markers
             var observations by remember { mutableStateOf(emptyList<Observation>()) }
-
             DisposableEffect(Unit) {
                 // Example usage in a coroutine scope
                 GlobalScope.launch {
@@ -212,12 +209,10 @@ fun MapCompose()
                         // Handle exceptions
                     }
                 }
-
                 onDispose {
                     // Cleanup, if needed
                 }
             }
-
             for (o in observations)
             {
                 Marker(

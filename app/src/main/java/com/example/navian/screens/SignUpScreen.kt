@@ -50,7 +50,7 @@ fun SignUpScreen(navController: NavController) {
                 .padding(bottom = 16.dp)
         )
 
-        Text("Username")
+        Text("Email:")
         TextField(
             value = email,
             onValueChange = { text -> email = text },
@@ -59,7 +59,7 @@ fun SignUpScreen(navController: NavController) {
                 .padding(bottom = 8.dp)
         )
 
-        Text("Password")
+        Text("Password:")
         TextField(
             value = password,
             onValueChange = { text -> password = text },
@@ -69,7 +69,7 @@ fun SignUpScreen(navController: NavController) {
                 .padding(bottom = 8.dp)
         )
 
-        Text("Confirm Password")
+        Text("Confirm Password:")
         TextField(
             value = confirmPassword,
             onValueChange = { text -> confirmPassword = text },
