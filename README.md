@@ -51,4 +51,4 @@ We value your feedback and are here to provide support. If you encounter any iss
 
 ## Demo Video
 
-Check out our demonstration video [here]([https://your-demo-video-link.com](https://youtu.be/EO_9VgBJAAY).
+Check out our demonstration video [here](https://youtu.be/EO_9VgBJAAY).
