@@ -30,9 +30,11 @@ import com.example.navian.Achievement
 import com.example.navian.Observation
 import com.example.navian.R
 import com.example.navian.services.readObservations
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
+@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun AchievementScreen(navController: NavController) {
 
@@ -82,8 +84,9 @@ fun AchievementCard(achievement: Achievement) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
-        ) {
+                .padding(8.dp)
+        )
+        {
             Text(text = achievement.title, fontWeight = FontWeight.Bold, fontSize = 20.sp)
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = achievement.description, fontSize = 16.sp)

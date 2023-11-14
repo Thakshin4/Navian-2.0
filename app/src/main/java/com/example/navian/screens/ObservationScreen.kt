@@ -8,15 +8,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -123,61 +128,67 @@ fun AddObservations(navController: NavController)
 
         locationLiveData.observeForever(locationObserver)
     }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    )
-    {
-        Text("Species:")
-        TextField(
-            value = species,
-            onValueChange = { text -> species = text },
+    Card() {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp)
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         )
-
-        Text("Location:")
-        location?.let {
-            val locationLatLng = LatLng(location!!.latitude, location!!.longitude)
-            Text(text = locationLatLng.toString())
-        }
-
-        DateTimeDialog(
-            onDatePicked = { pickedDate -> date = pickedDate },
-            onTimePicked = { pickedTime -> time = pickedTime },
-            context = context
-        )
-
-        Text("Notes:")
-        TextField(
-            value = notes,
-            onValueChange = { text -> notes = text },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp)
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        location?.let {
-            val locationLatLng = CustomLatLng(location!!.latitude, location!!.longitude)
-            Button(
-                onClick = {
-                    val  observation = Observation(species, locationLatLng, date.toString(), time.toString(), notes)
-                    handleCreateObservation(observation)
-                    Toast.makeText( context, "Added", Toast.LENGTH_LONG ).show()
-                },
+        {
+            OutlinedTextField(
+                label = { Text("Species") },
+                value = species,
+                onValueChange = { text -> species = text },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
-            ) { Text(text = "Confirm") }
-        }
+                    .padding(bottom = 8.dp)
+            )
 
+            Text("Location:")
+            location?.let {
+                val locationLatLng = LatLng(location!!.latitude, location!!.longitude)
+                Text(text = locationLatLng.toString())
+            }
+
+            DateTimeDialog(
+                onDatePicked = { pickedDate -> date = pickedDate },
+                onTimePicked = { pickedTime -> time = pickedTime },
+                context = context
+            )
+
+            OutlinedTextField(
+                label = { Text("Notes") },
+                value = notes,
+                onValueChange = { text -> notes = text },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            location?.let {
+                val locationLatLng = CustomLatLng(location!!.latitude, location!!.longitude)
+                Button(
+                    onClick = {
+                        val observation = Observation(
+                            species,
+                            locationLatLng,
+                            date.toString(),
+                            time.toString(),
+                            notes
+                        )
+                        handleCreateObservation(observation)
+                        Toast.makeText(context, "Added", Toast.LENGTH_LONG).show()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) { Text(text = "Confirm") }
+            }
+        }
     }
 }
 
@@ -203,17 +214,28 @@ fun ViewObservations(navController: NavController) {
 
     LazyColumn() {
         items(observations) { observation ->
-            Column(
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            )
+            {
+                Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
-            ) {
-                Text(text = observation.species, fontSize = 24.sp)
-                Text(text = observation.location.toString())
-                Text(text = observation.date.toString())
-                Text(text = observation.time.toString())
-                Text(text = observation.notes)
-                Divider()
+                )
+                {
+                    val locationtext = ("Location: ${ observation.location.latitude} , ${ observation.location.longitude }")
+                    Text(text = observation.species, fontSize = 24.sp)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = locationtext)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = observation.date)
+                    Text(text = observation.time)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = observation.notes)
+                }
             }
         }
     }
@@ -238,12 +260,12 @@ fun DateTimeDialog(
 
     Column(Modifier.padding(16.dp))
     {
-        Button(onClick = {  dateDialogState.show() })
+        OutlinedButton(onClick = {  dateDialogState.show() })
         { Text(text = "Pick date") }
 
         Text(text = formattedDate)
 
-        Button(onClick = { timeDialogState.show() })
+        OutlinedButton(onClick = { timeDialogState.show() })
         { Text(text = "Pick time") }
 
         Text(text = formattedTime)

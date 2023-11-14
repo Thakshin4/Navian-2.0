@@ -3,6 +3,8 @@ package com.example.navian.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
@@ -11,6 +13,13 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.Place
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
@@ -88,40 +97,40 @@ fun HomeBottomAppBar(navController: NavController)
         actions = {
             IconButton(onClick = { navController.navigate(Screen.ObservationScreen.route) }) {
                 Icon(
-                    Icons.Filled.Menu,
+                    Icons.Outlined.Menu,
                     contentDescription = "Localized description",
+                    modifier = Modifier.size(32.dp)
                 )
             }
             IconButton(onClick = { navController.navigate(Screen.HomeScreen.route) }) {
                 Icon(
-                    Icons.Filled.Home,
+                    Icons.Outlined.Home,
                     contentDescription = "Localized description",
+                    modifier = Modifier.size(32.dp)
                 )
             }
             IconButton(onClick = { navController.navigate(Screen.MapScreen.route) }) {
                 Icon(
-                    Icons.Filled.Place,
+                    Icons.Outlined.Place,
                     contentDescription = "Localized description",
+                    modifier = Modifier.size(32.dp)
                 )
             }
             IconButton(onClick = { navController.navigate(Screen.AchievementsScreen.route) }) {
                 Icon(
-                    Icons.Filled.Star,
+                    Icons.Outlined.CheckCircle,
                     contentDescription = "Localized description",
+                    modifier = Modifier.size(32.dp)
                 )
             }
             IconButton(onClick = { navController.navigate(Screen.SettingsScreen.route) }) {
                 Icon(
-                    Icons.Filled.Settings,
+                    Icons.Outlined.Settings,
                     contentDescription = "Localized description",
+                    modifier = Modifier.size(32.dp)
                 )
             }
         }
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-fun Preview() {
-    HomeScreen(navController = rememberNavController())
-}

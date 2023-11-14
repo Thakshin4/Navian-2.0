@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -48,8 +49,8 @@ fun SignInScreen(navController: NavController) {
                 .padding(bottom = 16.dp)
         )
 
-        Text("Email:")
-        TextField(
+        OutlinedTextField(
+            label = { Text("Email") },
             value = email,
             onValueChange = { text -> email = text },
             modifier = Modifier
@@ -57,14 +58,14 @@ fun SignInScreen(navController: NavController) {
                 .padding(bottom = 8.dp)
         )
 
-        Text("Password:")
-        TextField(
+        OutlinedTextField(
+            label = { Text("Password") },
             value = password,
             onValueChange = { text -> password = text },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp)
+                .padding(bottom = 16.dp),
         )
 
         Button(

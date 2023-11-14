@@ -1,22 +1,22 @@
 package com.example.navian
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -65,15 +65,22 @@ fun Navigation(){
 fun MainScreen(navController: NavController)
 {
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     )
     {
-        Icon(
-            Icons.Filled.CheckCircle,
-            contentDescription = "Localized description",
-            modifier = Modifier.padding(100.dp).wrapContentSize())
+        Spacer(modifier = Modifier.height(64.dp))
+
+        Image(
+            painter = painterResource(id = com.example.navian.R.drawable.navian_logo),
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+        )
 
         Text(
             text =
@@ -82,14 +89,23 @@ fun MainScreen(navController: NavController)
                 
                 Your Bird watching companion
             """
-                .trimIndent())
+                .trimIndent(),
+            fontSize = 18.sp)
 
         Spacer(modifier = Modifier.weight(1f))
 
         // Button at the bottom
         Button(
             onClick = { navController.navigate(Screen.SignInScreen.route) },
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) { Text(text = "Get Started") }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun Preview() {
+    MainScreen(navController = rememberNavController())
 }
