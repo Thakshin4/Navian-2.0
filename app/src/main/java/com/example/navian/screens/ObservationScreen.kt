@@ -51,7 +51,7 @@ var observationsList = mutableListOf<Observation>()
 @Composable
 fun ObservationScreen(navController: NavController)
 {
-    var screen by remember { mutableStateOf(true) }
+    var screen by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = { TopAppBar(if (screen) "View Observations" else "Add Observations") },

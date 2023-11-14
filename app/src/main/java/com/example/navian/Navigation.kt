@@ -21,6 +21,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.navian.screens.AchievementScreen
 import com.example.navian.screens.HomeScreen
 import com.example.navian.screens.MapScreen
 import com.example.navian.screens.ObservationScreen
@@ -53,6 +54,9 @@ fun Navigation(){
         }
         composable(route = Screen.ObservationScreen.route) {
             ObservationScreen(navController = navController)
+        }
+        composable(route = Screen.AchievementsScreen.route) {
+            AchievementScreen(navController = navController)
         }
     }
 }

@@ -104,7 +104,7 @@ fun HomeBottomAppBar(navController: NavController)
                     contentDescription = "Localized description",
                 )
             }
-            IconButton(onClick = { /* do something */ }) {
+            IconButton(onClick = { navController.navigate(Screen.AchievementsScreen.route) }) {
                 Icon(
                     Icons.Filled.Star,
                     contentDescription = "Localized description",

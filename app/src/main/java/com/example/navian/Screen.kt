@@ -9,4 +9,5 @@ sealed class Screen(val route: String)
     object MapScreen : Screen("map_screen")
     object SettingsScreen : Screen("settings_screen")
     object ObservationScreen : Screen("observation_screen")
+    object AchievementsScreen : Screen("achievements_screen")
 }

@@ -31,3 +31,11 @@ data class Settings(
         )
     }
 }
+
+data class Achievement(
+    val id: Int,
+    val title: String,
+    val description: String,
+    val iconResId: Int,
+    var isEarned: Boolean = false
+)

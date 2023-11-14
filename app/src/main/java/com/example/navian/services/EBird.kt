@@ -1,7 +1,6 @@
 package com.example.navian.services
 
 import android.location.Location
-import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -10,7 +9,6 @@ import okhttp3.Request
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-import java.io.IOException
 
 suspend fun getHotspotsAsync(location: Location): Result<List<LatLng>> {
     val apiKey = "m1hie22cmf2d" // Replace with your eBird API key
