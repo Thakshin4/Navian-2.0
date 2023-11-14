@@ -79,6 +79,8 @@ dependencies {
     // Android Maps Compose composables for the Maps SDK for Android
     implementation("com.google.maps.android:maps-compose:4.1.1")
     implementation("com.squareup.okhttp3:okhttp:4.9.2")
+    implementation("com.google.maps.android:android-maps-utils:0.6.2")
+
 
     // Date & Time Picker
     implementation("io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc")

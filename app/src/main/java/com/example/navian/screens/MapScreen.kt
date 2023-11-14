@@ -1,10 +1,10 @@
 package com.example.navian.screens
 
-import EBirdApiClient
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
@@ -25,9 +24,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -46,8 +43,11 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.example.navian.Screen
+import com.example.navian.services.getHotspotsAsync
+import com.example.navian.services.readObservations
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.maps.android.compose.rememberCameraPositionState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,7 +55,6 @@ import com.google.maps.android.compose.rememberCameraPositionState
 fun MapScreen(navController: NavController)
 {
     val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -146,33 +145,31 @@ fun MapCompose()
 
     location?.let {
         val currentLocation = LatLng(location!!.latitude, location!!.longitude)
+        val radius = 10.0
 
         val cameraPositionState = rememberCameraPositionState {
             position = CameraPosition.fromLatLngZoom(currentLocation, 10f)
         }
 
         // All the map stuff
-        val eBirdHotspots = mutableListOf<LatLng>()
-        val eBirdApiKey = "m1hie22cmf2d"
-        val eBirdApiClient = EBirdApiClient(apiKey = eBirdApiKey)
+        var hotspots by remember { mutableStateOf<List<LatLng>>(emptyList()) }
 
-        // EBird stuff
-        eBirdApiClient.getNearbyHotspots(
-            latitude = currentLocation.latitude, // Replace with your desired latitude
-            longitude = currentLocation.longitude, // Replace with your desired longitude
-            callback = { hotspots, exception ->
-                if (exception == null) {
-                    hotspots?.forEach { hotspotLatLng ->
-                        // Do something with each hotspot LatLng
-                        eBirdHotspots.add(hotspotLatLng)
-                        println("Hotspot: $hotspotLatLng")
-                    }
-                } else {
-                    // Handle the exception
-                    exception.printStackTrace()
-                }
+        LaunchedEffect(location)
+        {
+            val result = getHotspotsAsync(location!!)
+
+            // Update the hotspots list when the result is successful
+            result.onSuccess { hotspotsResult ->
+                hotspots = hotspotsResult
             }
-        )
+
+            // Handle errors if the result is a failure
+            result.onFailure { error ->
+                // Handle the error, e.g., show a message to the user
+                Log.d("Error fetching hotspots", error.toString())
+            }
+        }
+
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState
@@ -184,18 +181,31 @@ fun MapCompose()
                 snippet = "Marker in Current Location"
             )
 
+            Log.d("Hotspot Tag", "Displaying Hotspots")
+
             // Display Hotspot Markers
-            for (hotspot in eBirdHotspots)
+            for (hotspot in hotspots)
             {
+                Log.d("Hotspot Tag", hotspot.toString())
                 Marker(
                     state = MarkerState(position = hotspot),
                     title = "Hotspot Location",
-                    snippet = "Marker in Current Location"
+                    snippet = "Marker in Current Location",
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
                 )
             }
 
             // Display Observations Markers
-            // TODO //
+            val observations = readObservations()
+            for (o in observations)
+            {
+                Marker(
+                    state = MarkerState(position = o.location),
+                    title = "Hotspot Location",
+                    snippet = "Marker in Current Location",
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)
+                )
+            }
         }
     }
 }

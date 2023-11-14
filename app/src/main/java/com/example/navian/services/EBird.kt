@@ -1,57 +1,66 @@
+package com.example.navian.services
+
+import android.location.Location
+import android.util.Log
 import com.google.android.gms.maps.model.LatLng
-import okhttp3.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
 
-class EBirdApiClient(private val apiKey: String) {
+suspend fun getHotspotsAsync(location: Location): Result<List<LatLng>> {
+    val apiKey = "m1hie22cmf2d" // Replace with your eBird API key
+    val radius = 10
+    val url = "https://api.ebird.org/v2/ref/hotspot/geo?lat=${location.latitude}&lng=${location.longitude}&dist=${radius}&fmt=json"
 
-    fun getNearbyHotspots(
-        latitude: Double,
-        longitude: Double,
-        callback: (List<LatLng>?, Exception?) -> Unit
-    ) {
-        val url = "https://api.ebird.org/v2/ref/hotspot/geo?lat=$latitude&lng=$longitude"
-
-        val request = Request.Builder()
-            .url(url)
-            .header("X-eBirdApiToken", apiKey)
-            .build()
-
-        OkHttpClient().newCall(request).enqueue(object : Callback {
-            override fun onResponse(call: Call, response: Response) {
-                try {
-                    if (response.isSuccessful) {
-                        val hotspots = parseHotspots(response.body?.string())
-                        callback(hotspots, null)
-                    } else {
-                        callback(null, Exception("Request failed with code ${response.code}"))
-                    }
-                } catch (e: Exception) {
-                    callback(null, e)
-                }
-            }
-
-            override fun onFailure(call: Call, e: IOException) {
-                callback(null, e)
-            }
-        })
-    }
-
-    private fun parseHotspots(responseBody: String?): List<LatLng> {
-        val hotspotsList = mutableListOf<LatLng>()
-
-        responseBody?.let {
-            val jsonArray = JSONArray(it)
-
-            for (i in 0 until jsonArray.length()) {
-                val jsonObject: JSONObject = jsonArray.getJSONObject(i)
-                val lat = jsonObject.getDouble("lat")
-                val lng = jsonObject.getDouble("lng")
-                hotspotsList.add(LatLng(lat, lng))
-            }
+    return try {
+        val response = withContext(Dispatchers.IO) {
+            OkHttpClient().newCall(Request.Builder().url(url).header("X-eBirdApiToken", apiKey).build()).execute()
         }
 
-        return hotspotsList
+        if (!response.isSuccessful) {
+            // Handle the case where the API request was not successful
+            return Result.failure(Exception("Request failed with code ${response.code}"))
+        }
+
+        // Extract hotspots from the response body
+        val hotspots = parseHotspots(response.body?.string())
+        Result.success(hotspots)
+    } catch (e: Exception) {
+        // Handle any exceptions that might occur during the network request
+        Result.failure(e)
     }
+}
+
+private fun parseHotspots(responseBody: String?): List<LatLng> {
+    val hotspotsList = mutableListOf<LatLng>()
+
+    try {
+        // Try to parse the response body as a JSON array
+        val jsonArray = JSONArray(responseBody)
+
+        for (i in 0 until jsonArray.length()) {
+            val jsonObject: JSONObject = jsonArray.getJSONObject(i)
+            val lat = jsonObject.getDouble("lat")
+            val lng = jsonObject.getDouble("lng")
+            hotspotsList.add(LatLng(lat, lng))
+        }
+    } catch (e: JSONException) {
+        // If parsing as JSON array fails, try to parse as a single hotspot
+        try {
+            val jsonObject = JSONObject(responseBody)
+            val lat = jsonObject.getDouble("lat")
+            val lng = jsonObject.getDouble("lng")
+            hotspotsList.add(LatLng(lat, lng))
+        } catch (e: JSONException) {
+            // Handle the case where parsing fails
+            e.printStackTrace()
+        }
+    }
+
+    return hotspotsList
 }
