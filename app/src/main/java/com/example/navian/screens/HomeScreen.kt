@@ -98,11 +98,8 @@ fun HomeScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             LazyColumn {
-                items(posts) {
-                    for (post in posts)
-                    {
-                        PostCard(post)
-                    }
+                items(posts) { post ->
+                    PostCard(post)
                 }
             }
         }
