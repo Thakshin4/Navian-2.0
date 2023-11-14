@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 fun SettingsScreen(navController: NavController)
 {
     var unit by remember { mutableStateOf("metric") }
-    var radius by remember { mutableFloatStateOf(1f) }
+    var radius by remember { mutableFloatStateOf(10f) }
 
     DisposableEffect(Unit) {
         // Example usage in a coroutine scope

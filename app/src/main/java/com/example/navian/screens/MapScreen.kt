@@ -149,7 +149,6 @@ fun MapCompose()
 
     location?.let {
         val currentLocation = LatLng(location!!.latitude, location!!.longitude)
-        val radius = 10.0
 
         val cameraPositionState = rememberCameraPositionState {
             position = CameraPosition.fromLatLngZoom(currentLocation, 10f)

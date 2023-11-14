@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.CornerRadius
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +22,7 @@ import org.json.JSONObject
 suspend fun getHotspotsAsync(location: Location): Result<List<LatLng>> {
     val apiKey = "m1hie22cmf2d" // Replace with your eBird API key
 
-    var radius = 1f
+    var radius = 10f
 
     GlobalScope.launch {
         try {
