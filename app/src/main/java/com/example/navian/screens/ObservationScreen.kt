@@ -43,6 +43,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import com.example.navian.CustomLatLng
 import com.example.navian.Observation
+import com.example.navian.services.addPost
 import com.example.navian.services.handleCreateObservation
 import com.example.navian.services.readObservations
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -235,6 +236,13 @@ fun ViewObservations(navController: NavController) {
                     Text(text = observation.time)
                         Spacer(modifier = Modifier.height(8.dp))
                     Text(text = observation.notes)
+
+                    Button(
+                        onClick = { addPost(observation.toString()) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) { Text(text = "Post") }
                 }
             }
         }

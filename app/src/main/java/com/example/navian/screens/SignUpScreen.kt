@@ -31,6 +31,8 @@ import com.example.navian.services.validatePassword
 
 @Composable
 fun SignUpScreen(navController: NavController) {
+
+    var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -51,6 +53,14 @@ fun SignUpScreen(navController: NavController) {
                 .padding(bottom = 16.dp)
         )
 
+        OutlinedTextField(
+            label = { Text("Username") },
+            value = username,
+            onValueChange = { text -> username = text },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+        )
 
         OutlinedTextField(
             label = { Text("Email") },
@@ -82,7 +92,7 @@ fun SignUpScreen(navController: NavController) {
         )
 
         Button(
-            onClick = { error = signUp(navController, email, password, confirmPassword) },
+            onClick = { error = signUp(navController, email, password, confirmPassword, username) },
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.CenterHorizontally)
@@ -109,7 +119,7 @@ fun SignUpScreen(navController: NavController) {
     }
 }
 
-fun signUp(navController: NavController, email: String, password: String, passwordConfirm: String) : String
+fun signUp(navController: NavController, email: String, password: String, passwordConfirm: String, username: String) : String
 {
     val message: String = ""
 
@@ -123,7 +133,7 @@ fun signUp(navController: NavController, email: String, password: String, passwo
     if (!password.equals(passwordConfirm))
     { return "Password do not match" }
 
-    handleSignUp(navController, email, password, passwordConfirm)
+    handleSignUp(navController, email, password, passwordConfirm, username)
 
     return message
 }

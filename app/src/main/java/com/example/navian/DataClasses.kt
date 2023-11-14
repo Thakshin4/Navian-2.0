@@ -49,3 +49,19 @@ data class Achievement(
     val iconResId: Int,
     var isEarned: Boolean = false
 )
+
+data class Post(
+    val username: String,
+    val observation: String,
+    val timestamp: Long = System.currentTimeMillis()
+)
+{
+    constructor() : this("", "")
+    fun toMap(): Map<String, Any>
+    {
+        return mapOf(
+            "username" to username,
+            "observation" to observation
+        )
+    }
+}

@@ -51,6 +51,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -111,6 +112,7 @@ fun MapScreen(navController: NavController)
     }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun MapCompose()
 {

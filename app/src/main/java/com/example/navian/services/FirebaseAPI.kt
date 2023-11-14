@@ -2,9 +2,11 @@ package com.example.navian.services
 
 import androidx.navigation.NavController
 import com.example.navian.Observation
+import com.example.navian.Post
 import com.example.navian.Screen
 import com.example.navian.Settings
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -27,16 +29,34 @@ fun handleSignIn(navController: NavController, email: String, password: String)
     }
 }
 
-fun handleSignUp(navController: NavController, email: String, password: String, passwordConfirm: String)
-{
+fun handleSignUp(navController: NavController, email: String, password: String, passwordConfirm: String, username: String) {
     // Create an instance of FirebaseAuth
     val auth = FirebaseAuth.getInstance()
 
     // Create User
     auth.createUserWithEmailAndPassword(email, password)
         .addOnCompleteListener { task ->
-            if (task.isSuccessful)
-            { navController.navigate(Screen.SignInScreen.route) }
+            if (task.isSuccessful) {
+                // Update the user's profile with the provided username
+                val user = auth.currentUser
+                val profileUpdates = UserProfileChangeRequest.Builder()
+                    .setDisplayName(username)
+                    .build()
+
+                user?.updateProfile(profileUpdates)
+                    ?.addOnCompleteListener { profileTask ->
+                        if (profileTask.isSuccessful) {
+                            // Successfully updated user profile
+                            navController.navigate(Screen.SignInScreen.route)
+                        } else {
+                            // Handle the error in updating user profile
+                            // You can log an error, show a message, etc.
+                        }
+                    }
+            } else {
+                // Handle the error in creating a new user
+                // You can log an error, show a message, etc.
+            }
         }
 }
 
@@ -191,3 +211,62 @@ suspend fun readSettings(): Settings? = suspendCancellableCoroutine { continuati
         }
     })
 }
+
+// Function to add a post to the database
+fun addPost(observation: String) {
+    // Get the currently logged-in user's username
+    val user = FirebaseAuth.getInstance().currentUser
+    val username = user?.displayName ?: "Unknown"  // Use "Unknown" if username is not available
+
+    // Create a reference to the "posts" node in the database
+    val postsRef = FirebaseDatabase.getInstance().getReference("posts")
+
+    // Generate a key for the new post
+    val postKey = postsRef.push().key
+
+    // Create the post object
+    val post = Post(username, observation)
+
+    // Use a HashMap to update multiple values at once
+    val postValues = post.toMap()
+
+    // Create a childUpdates map to update the database
+    val childUpdates = HashMap<String, Any>()
+    childUpdates["$postKey"] = postValues
+
+    // Update the database with the new post
+    postsRef.updateChildren(childUpdates)
+        .addOnSuccessListener {
+            // Post added successfully
+        }
+        .addOnFailureListener { e ->
+            // Handle the error in adding the post
+            // You can log an error, show a message, etc.
+        }
+}
+
+// Function to retrieve all posts from the database
+suspend fun readPosts(): List<Post> = suspendCancellableCoroutine { continuation ->
+    val postsRef = FirebaseDatabase.getInstance().getReference("posts")
+
+    postsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+            val posts = mutableListOf<Post>()
+
+            for (postSnapshot in dataSnapshot.children) {
+                val post = postSnapshot.getValue(Post::class.java)
+                post?.let {
+                    posts.add(post)
+                }
+            }
+
+            continuation.resume(posts)
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+            continuation.resumeWithException(databaseError.toException())
+        }
+    })
+}
+
+
