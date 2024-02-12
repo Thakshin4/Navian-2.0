@@ -1,6 +1,7 @@
 # Navian Birding App - README
 
 Welcome to Navian, your go-to birding app for discovering and tracking avian species. This README provides a comprehensive guide to the Navian app, including its features, installation, and basic usage.
+
 ![image](https://github.com/Thakshin4/Navian-2.0/assets/69991863/34f8c601-d149-4572-ac42-b16961f2564e)
 
 ## Table of Contents
